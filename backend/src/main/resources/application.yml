@@ -21,7 +21,7 @@ spring:
   
   # Configuração do Flyway
   flyway:
-    url: jdbc:postgresql://localhost:5432/clinica
+    url: jdbc:postgresql://localhost:5433/clinica
     user: postgres
     password: postgres
     baseline-on-migrate: true
