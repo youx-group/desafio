@@ -72,6 +72,21 @@
 - **Modal reutilizável para ações** ✅
 - **Tratamento de erros personalizado** ✅
 
+### ✅ 01/01/2025 - Controller Advice para Tratamento de Erros
+- **Exceções customizadas para JWT (TokenExpiredException, TokenInvalidException, TokenMissingException)** ✅
+- **DTO padronizado para respostas de erro (ErrorResponseDTO)** ✅
+- **GlobalExceptionHandler para tratar erros nos controllers** ✅
+- **JwtAuthenticationEntryPoint para erros de autenticação JWT** ✅
+- **JwtAccessDeniedHandler para erros de autorização** ✅
+- **Atualização do SecurityConfig com novos handlers** ✅
+- **Atualização do JwtAuthenticationFilter para marcar tipos de erro** ✅
+- **Testes unitários para GlobalExceptionHandler e JwtAuthenticationEntryPoint** ✅
+- **Tratamento específico de token expirado (HTTP 401)** ✅
+- **Tratamento específico de token inválido (HTTP 401)** ✅
+- **Tratamento específico de token ausente (HTTP 401)** ✅
+- **Tratamento adequado de erros CORS** ✅
+- **Logs estruturados para debugging** ✅
+
 ---
 
 ## 🚧 Próximas Tarefas
@@ -82,7 +97,7 @@
   - [ ] Formulário de agendamento
   - [ ] Formulário de edição de consulta
   - [ ] Visualização de detalhes
-  - [ ] Filtros por data/status/médico
+  - [ ] Filtros por data/status/status/médico
 
 - [ ] **CRUD de Usuários (apenas MEDICO)**
   - [ ] Página de listagem de usuários

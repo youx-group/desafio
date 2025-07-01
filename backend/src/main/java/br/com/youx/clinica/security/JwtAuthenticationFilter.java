@@ -42,48 +42,94 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt = jwtService.extractTokenFromHeader(authHeader);
         
-        // Se não há token ou usuário já está autenticado, continua
-        if (jwt == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+        // Se usuário já está autenticado, continua
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
+        // Se não há token, marca como token ausente e continua
+        // O Spring Security irá redirecionar para o AuthenticationEntryPoint
+        if (jwt == null) {
+            request.setAttribute("jwt.error", "TOKEN_MISSING");
+            request.setAttribute("jwt.error.message", "Token de acesso não fornecido");
             filterChain.doFilter(request, response);
             return;
         }
         
         try {
-            // Valida o token
-            if (jwtService.isTokenValid(jwt) && !jwtService.isTokenExpired(jwt)) {
-                // Extrai informações do token
-                String cpf = jwtService.extractCpf(jwt);
-                String role = jwtService.extractRole(jwt);
-                Long userId = jwtService.extractUserId(jwt);
-                String nome = jwtService.extractNome(jwt);
-                
-                // Cria as authorities baseadas na role
-                List<SimpleGrantedAuthority> authorities = List.of(
-                    new SimpleGrantedAuthority("ROLE_" + role)
-                );
-                
-                // Cria o token de autenticação
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    cpf, // Principal (CPF do usuário)
-                    null, // Credentials (null pois já foi validado)
-                    authorities
-                );
-                
-                // Adiciona detalhes da requisição
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                
-                // Adiciona informações adicionais no contexto
-                JwtAuthenticationToken jwtAuthToken = new JwtAuthenticationToken(
-                    cpf, authorities, userId, nome, role
-                );
-                jwtAuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                
-                // Define no contexto de segurança
-                SecurityContextHolder.getContext().setAuthentication(jwtAuthToken);
+            // Primeiro verifica se o token é válido
+            if (!jwtService.isTokenValid(jwt)) {
+                // Token inválido
+                request.setAttribute("jwt.error", "TOKEN_INVALID");
+                request.setAttribute("jwt.error.message", "Token JWT inválido ou malformado");
+                SecurityContextHolder.clearContext();
+                filterChain.doFilter(request, response);
+                return;
             }
-        } catch (Exception e) {
-            // Token inválido - remove qualquer autenticação existente
+            
+            // Verifica se o token está expirado
+            if (jwtService.isTokenExpired(jwt)) {
+                // Token expirado
+                request.setAttribute("jwt.error", "TOKEN_EXPIRED");
+                request.setAttribute("jwt.error.message", "Token JWT expirado");
+                SecurityContextHolder.clearContext();
+                filterChain.doFilter(request, response);
+                return;
+            }
+            
+            // Token válido e não expirado - processa autenticação
+            // Extrai informações do token
+            String cpf = jwtService.extractCpf(jwt);
+            String role = jwtService.extractRole(jwt);
+            Long userId = jwtService.extractUserId(jwt);
+            String nome = jwtService.extractNome(jwt);
+            
+            // Cria as authorities baseadas na role
+            List<SimpleGrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_" + role)
+            );
+            
+            // Cria o token de autenticação
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                cpf, // Principal (CPF do usuário)
+                null, // Credentials (null pois já foi validado)
+                authorities
+            );
+            
+            // Adiciona detalhes da requisição
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            
+            // Adiciona informações adicionais no contexto
+            JwtAuthenticationToken jwtAuthToken = new JwtAuthenticationToken(
+                cpf, authorities, userId, nome, role
+            );
+            jwtAuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            
+            // Define no contexto de segurança
+            SecurityContextHolder.getContext().setAuthentication(jwtAuthToken);
+            
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            // Token expirado - exceção específica do JWT
+            request.setAttribute("jwt.error", "TOKEN_EXPIRED");
+            request.setAttribute("jwt.error.message", "Token JWT expirado: " + e.getMessage());
             SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
+            return;
+        } catch (io.jsonwebtoken.JwtException e) {
+            // Erro genérico de JWT (token inválido, malformado, etc.)
+            request.setAttribute("jwt.error", "TOKEN_INVALID");
+            request.setAttribute("jwt.error.message", "Token JWT inválido: " + e.getMessage());
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
+            return;
+        } catch (Exception e) {
+            // Erro genérico
+            request.setAttribute("jwt.error", "TOKEN_INVALID");
+            request.setAttribute("jwt.error.message", "Erro ao processar token JWT: " + e.getMessage());
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
+            return;
         }
         
         filterChain.doFilter(request, response);

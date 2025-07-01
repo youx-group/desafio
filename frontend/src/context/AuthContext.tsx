@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken(response.token);
       setUser(response.usuario);
       
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('tokenn', response.token);
       localStorage.setItem('user', JSON.stringify(response.usuario));
       
       toast.success('Login realizado com sucesso!');
@@ -62,7 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.refreshToken();
       setToken(response.token);
       setUser(response.usuario);
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('tokenn', response.token);
       localStorage.setItem('user', JSON.stringify(response.usuario));
     } catch (error) {
       logout();
