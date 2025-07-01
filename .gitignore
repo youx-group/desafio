@@ -192,7 +192,6 @@ coverage/
 
 # PostgreSQL
 *.dump
-*.sql
 
 # =============================================================================
 # SEGURANÇA e CONFIGURAÇÕES SENSÍVEIS
