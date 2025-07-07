@@ -22,10 +22,10 @@ public class CorsConfig {
         
         // Permitir origens específicas (frontend)
         configuration.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:30000",
-            "http://127.0.0.1:30000",
-            "https://localhost:30000",
-            "https://127.0.0.1:30000"
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "https://localhost:3000",
+            "https://127.0.0.1:3000"
         ));
         
         // Permitir métodos HTTP

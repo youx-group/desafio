@@ -21,7 +21,7 @@ spring:
   
   # Configuração do Flyway
   flyway:
-    url: jdbc:postgresql://localhost:5433/clinica
+    url: jdbc:postgresql://localhost:5432/clinica
     user: postgres
     password: postgres
     baseline-on-migrate: true
@@ -38,6 +38,6 @@ clinica:
     # Chave secreta para assinatura dos tokens JWT (em produção, usar uma chave mais robusta)
     secret: "clinica-youx-jwt-secret-key-2024-muito-secreta-e-longa"
     # Expiração do token em millisegundos (24 horas = 86400000)
-    expiration: 2400
+    expiration: 86400000
     # Issuer do token
     issuer: "clinica-youx"
