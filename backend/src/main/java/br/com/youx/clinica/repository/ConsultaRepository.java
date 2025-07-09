@@ -2,6 +2,7 @@ package br.com.youx.clinica.repository;
 
 import br.com.youx.clinica.model.Consulta;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,7 @@ import java.util.List;
  * Fornece métodos CRUD básicos e consultas customizadas
  */
 @Repository
-public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
+public interface ConsultaRepository extends JpaRepository<Consulta, Long>, JpaSpecificationExecutor<Consulta> {
     
     /**
      * Busca consultas por paciente

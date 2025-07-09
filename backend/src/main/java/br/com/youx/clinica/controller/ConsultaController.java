@@ -5,6 +5,7 @@ import br.com.youx.clinica.dto.consulta.ConsultaResponseDTO;
 import br.com.youx.clinica.service.ConsultaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,40 @@ import java.util.Optional;
 public class ConsultaController {
     
     private final ConsultaService consultaService;
+    
+    /**
+     * Busca paginada de consultas com filtros
+     * @param nomePaciente Nome do paciente para filtrar (opcional)
+     * @param nomeMedico Nome do médico para filtrar (opcional)
+     * @param dataInicio Data de início do período (opcional)
+     * @param dataFim Data de fim do período (opcional)
+     * @param pacienteId ID do paciente (opcional)
+     * @param medicoId ID do médico (opcional)
+     * @param page Número da página (padrão: 0)
+     * @param size Tamanho da página (padrão: 10)
+     * @param sort Campo para ordenação (padrão: data)
+     * @param direction Direção da ordenação (padrão: desc)
+     * @return Página de consultas filtradas
+     */
+    @GetMapping("/paginated")
+    public ResponseEntity<Page<ConsultaResponseDTO>> buscarPaginadoComFiltros(
+            @RequestParam(required = false) String nomePaciente,
+            @RequestParam(required = false) String nomeMedico,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim,
+            @RequestParam(required = false) Long pacienteId,
+            @RequestParam(required = false) Long medicoId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "data") String sort,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        Page<ConsultaResponseDTO> consultas = consultaService.buscarPaginadoComFiltros(
+                nomePaciente, nomeMedico, dataInicio, dataFim, pacienteId, medicoId, 
+                page, size, sort, direction
+        );
+        return ResponseEntity.ok(consultas);
+    }
     
     /**
      * Lista todas as consultas

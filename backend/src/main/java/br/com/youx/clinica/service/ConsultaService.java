@@ -9,7 +9,13 @@ import br.com.youx.clinica.model.Usuario;
 import br.com.youx.clinica.repository.ConsultaRepository;
 import br.com.youx.clinica.repository.PacienteRepository;
 import br.com.youx.clinica.repository.UsuarioRepository;
+import br.com.youx.clinica.specification.ConsultaSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +36,70 @@ public class ConsultaService {
     private final PacienteRepository pacienteRepository;
     private final UsuarioRepository usuarioRepository;
     private final ConsultaMapper consultaMapper;
+    
+    /**
+     * Busca paginada de consultas com filtros
+     * @param nomePaciente Nome do paciente para filtrar (opcional)
+     * @param nomeMedico Nome do médico para filtrar (opcional)
+     * @param dataInicio Data de início do período (opcional)
+     * @param dataFim Data de fim do período (opcional)
+     * @param pacienteId ID do paciente (opcional)
+     * @param medicoId ID do médico (opcional)
+     * @param page Número da página (padrão: 0)
+     * @param size Tamanho da página (padrão: 10)
+     * @param sort Campo para ordenação (padrão: data)
+     * @param direction Direção da ordenação (padrão: desc)
+     * @return Página de consultas filtradas
+     */
+    @Transactional(readOnly = true)
+    public Page<ConsultaResponseDTO> buscarPaginadoComFiltros(
+            String nomePaciente,
+            String nomeMedico,
+            LocalDateTime dataInicio,
+            LocalDateTime dataFim,
+            Long pacienteId,
+            Long medicoId,
+            int page,
+            int size,
+            String sort,
+            String direction
+    ) {
+        // Configura ordenação
+        Sort.Direction sortDirection = "asc".equalsIgnoreCase(direction) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sortBy = Sort.by(sortDirection, sort);
+        
+        // Configura paginação
+        Pageable pageable = PageRequest.of(page, size, sortBy);
+        
+        // Constrói filtros com Specification
+        Specification<Consulta> spec = Specification.where(null);
+        
+        if (nomePaciente != null && !nomePaciente.trim().isEmpty()) {
+            spec = spec.and(ConsultaSpecification.nomePacienteContains(nomePaciente));
+        }
+        
+        if (nomeMedico != null && !nomeMedico.trim().isEmpty()) {
+            spec = spec.and(ConsultaSpecification.nomeMedicoContains(nomeMedico));
+        }
+        
+        if (dataInicio != null || dataFim != null) {
+            spec = spec.and(ConsultaSpecification.entreDatas(dataInicio, dataFim));
+        }
+        
+        if (pacienteId != null) {
+            spec = spec.and(ConsultaSpecification.pacienteId(pacienteId));
+        }
+        
+        if (medicoId != null) {
+            spec = spec.and(ConsultaSpecification.medicoId(medicoId));
+        }
+        
+        // Executa busca paginada
+        Page<Consulta> consultas = consultaRepository.findAll(spec, pageable);
+        
+        // Converte para DTO
+        return consultas.map(consultaMapper::toResponseDTO);
+    }
     
     /**
      * Lista todas as consultas
