@@ -38,6 +38,8 @@ public class PacienteController {
     
     /**
      * Lista pacientes com paginação e filtros
+     * ex: pacientes/pagina?busca=Silva&page=0&size=5
+     * page: 0 é a primeira página
      * @param busca Termo de busca para nome ou CPF (opcional)
      * @param pageable Informações de paginação (page, size, sort)
      * @return Página de pacientes
