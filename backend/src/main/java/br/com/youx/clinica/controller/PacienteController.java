@@ -5,6 +5,9 @@ import br.com.youx.clinica.dto.paciente.PacienteResponseDTO;
 import br.com.youx.clinica.service.PacienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +33,20 @@ public class PacienteController {
     @GetMapping
     public ResponseEntity<List<PacienteResponseDTO>> listarTodos() {
         List<PacienteResponseDTO> pacientes = pacienteService.listarTodos();
+        return ResponseEntity.ok(pacientes);
+    }
+    
+    /**
+     * Lista pacientes com paginação e filtros
+     * @param busca Termo de busca para nome ou CPF (opcional)
+     * @param pageable Informações de paginação (page, size, sort)
+     * @return Página de pacientes
+     */
+    @GetMapping("/pagina")
+    public ResponseEntity<Page<PacienteResponseDTO>> listarComPaginacao(
+            @RequestParam(value = "busca", required = false) String busca,
+            @PageableDefault(size = 20, sort = "nome") Pageable pageable) {
+        Page<PacienteResponseDTO> pacientes = pacienteService.listarComPaginacao(busca, pageable);
         return ResponseEntity.ok(pacientes);
     }
     

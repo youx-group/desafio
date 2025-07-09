@@ -87,6 +87,13 @@
 - **Tratamento adequado de erros CORS** ✅
 - **Logs estruturados para debugging** ✅
 
+### ✅ 01/01/2025 - Endpoint de Paginação para Pacientes
+- **Criar PacienteSpecification para filtros por nome e CPF** ✅
+- **Atualizar PacienteRepository para suportar Specification** ✅
+- **Implementar método paginado no PacienteService** ✅
+- **Adicionar endpoint de paginação no PacienteController** ✅
+- **Documentar endpoint no ENDPOINTS_CONSULTA.md** ✅
+
 ---
 
 ## 🚧 Próximas Tarefas

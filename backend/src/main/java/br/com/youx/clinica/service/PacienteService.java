@@ -5,7 +5,11 @@ import br.com.youx.clinica.dto.paciente.PacienteResponseDTO;
 import br.com.youx.clinica.mapper.PacienteMapper;
 import br.com.youx.clinica.model.Paciente;
 import br.com.youx.clinica.repository.PacienteRepository;
+import br.com.youx.clinica.specification.PacienteSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +36,24 @@ public class PacienteService {
     public List<PacienteResponseDTO> listarTodos() {
         List<Paciente> pacientes = pacienteRepository.findAll();
         return pacienteMapper.toResponseDTOList(pacientes);
+    }
+    
+    /**
+     * Lista pacientes com paginação e filtros
+     * @param busca Termo de busca para nome ou CPF (opcional)
+     * @param pageable Informações de paginação
+     * @return Página de pacientes
+     */
+    @Transactional(readOnly = true)
+    public Page<PacienteResponseDTO> listarComPaginacao(String busca, Pageable pageable) {
+        // Cria specification para busca por nome ou CPF
+        Specification<Paciente> spec = PacienteSpecification.nomeOuCpfContains(busca);
+        
+        // Busca com paginação e filtros
+        Page<Paciente> pacientePage = pacienteRepository.findAll(spec, pageable);
+        
+        // Converte para DTO
+        return pacientePage.map(pacienteMapper::toResponseDTO);
     }
     
     /**
