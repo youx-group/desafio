@@ -2,30 +2,34 @@ spring:
   application:
     name: clinica
   
-  # Configuração do banco de dados PostgreSQL
+  # Configuração do banco de dados H2 (em memória para desenvolvimento)
   datasource:
-    url: jdbc:postgresql://localhost:5432/clinica
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:h2:mem:clinica;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
   
-  # Configuração do JPA/Hibernate
+  # Configuração do JPA/Hibernate para H2
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop  # Cria e dropa tabelas automaticamente
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
   
-  # Configuração do Flyway
+  # Console H2 para desenvolvimento (acessível em http://localhost:8080/h2-console)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+  
+  # Flyway desabilitado para desenvolvimento com H2
   flyway:
-    url: jdbc:postgresql://localhost:5432/clinica
-    user: postgres
-    password: postgres
-    baseline-on-migrate: true
-    locations: classpath:db/migration
+    enabled: false
 
 # Configurações de segurança da aplicação
 clinica:
