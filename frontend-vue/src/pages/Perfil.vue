@@ -1,0 +1,11 @@
+<template>
+  <div class="text-center py-8">
+    <h2 class="text-2xl font-bold text-gray-900">Meu Perfil</h2>
+    <p class="text-gray-600 mt-2">Esta funcionalidade será implementada em breve.</p>
+  </div>
+</template>
+
+<script setup lang="ts">
+// Página placeholder para perfil
+</script>
+
